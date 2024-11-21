@@ -31,10 +31,12 @@ provider:
     USERS_TABLE: ${param:tableName}
 
 functions:
-  api:
-    handler: handler.handler
+  tickets:
+    handler: tickets.handler
     events:
-      - httpApi: "*"
+      - httpApi: 
+          path: ticket/{proxy+}
+          method: ANY
 
 resources:
   Resources:
