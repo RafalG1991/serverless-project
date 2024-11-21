@@ -31,6 +31,12 @@ provider:
     USERS_TABLE: ${param:tableName}
 
 functions:
+  auth:
+    handler: auth.handler
+    events:
+      - httpApi:
+          path: /auth/{proxy+}
+          method: POST
   tickets:
     handler: tickets.handler
     events:
