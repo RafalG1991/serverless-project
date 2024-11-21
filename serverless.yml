@@ -35,7 +35,7 @@ functions:
     handler: tickets.handler
     events:
       - httpApi: 
-          path: ticket/{proxy+}
+          path: /ticket/{proxy+}
           method: ANY
 
 resources:
