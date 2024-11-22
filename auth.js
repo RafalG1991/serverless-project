@@ -5,9 +5,13 @@ const app = express();
 
 app.use(express.json());
 
-app.post("/auth/login", async (req, res) => {
+const router = express.Router();
+
+router.post("/login", async (req, res) => {
     res.status(200).json({ message: "OK" });
 });
+
+app.use('/auth', router);
 
 app.use((req, res, next) => {
   return res.status(404).json({
