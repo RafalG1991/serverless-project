@@ -30,6 +30,8 @@ provider:
             - Fn::GetAtt: [UsersTable, Arn]
   environment:
     USERS_TABLE: ${param:tableName}
+    USER_POOL_ID: { Ref: UserPool }
+    CLIENT_ID: { Ref: UserClient }
 
 functions:
   auth:
