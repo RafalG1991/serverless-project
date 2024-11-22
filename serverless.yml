@@ -33,6 +33,16 @@ provider:
     USER_POOL_ID: { Ref: UserPool }
     CLIENT_ID: { Ref: UserClient }
 
+  httpApi:
+    authorizers:
+      ticketSystemAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: 
+          Fn::Sub: https://cognito-idp.${AWS:region}.amazonaws.com/${UserPool}
+        audience:
+          - { Ref: UserClient }
+          
 functions:
   auth:
     handler: auth.handler
