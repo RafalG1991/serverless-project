@@ -28,6 +28,14 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [UsersTable, Arn]
+        - Effect: Allow
+          Action:
+            - cognito-idp: AdminInitiateAuth
+            - cognito-idp: AdminCreateUser
+            - cognito-idp: AdminSetUserPassword
+          Resource:
+            - Fn::Sub: arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
+            
   environment:
     USERS_TABLE: ${param:tableName}
     USER_POOL_ID: { Ref: UserPool }
@@ -39,7 +47,7 @@ provider:
         type: jwt
         identitySource: $request.header.Authorization
         issuerUrl: 
-          Fn::Sub: https://cognito-idp.${AWS:region}.amazonaws.com/${UserPool}
+          Fn::Sub: https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
         audience:
           - { Ref: UserClient }
           
@@ -56,6 +64,8 @@ functions:
       - httpApi: 
           path: /ticket/{proxy+}
           method: ANY
+          authorizer:
+            name: ticketSystemAuthorizer
 
 resources:
   Resources:
