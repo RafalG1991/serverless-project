@@ -43,7 +43,7 @@ router.post(
       console.log(error);
 
       res.status(500).json({ 
-        message: "Nie udało się zarejestrować użytkownika",
+        message: "Nie udało się zalogować",
         error: error.message, 
       });
     }
