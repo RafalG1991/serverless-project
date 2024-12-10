@@ -37,7 +37,7 @@ router.post(
       const command = new AdminInitiateAuthCommand(params);
       const response = await clientCognito.send(command);
 
-      res.status(200).json({ sub: response.UserSub });
+      res.status(200).json({ ...response.AuthenticationResult });
 
     } catch(error) {
       console.log(error);
