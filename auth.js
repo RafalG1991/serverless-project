@@ -96,6 +96,43 @@ router.post(
     }
   });
 
+router.post(
+  "/new-password", 
+  body('email').isEmail(), 
+  body('session').notEmpty(), 
+  body('password').notEmpty(), 
+  async (req, res) => {
+    const result = validationResult(req);
+    if(!result.isEmpty()) {
+      return res.status(500).json({ errors: result.array() })
+    }
+  
+    const params = {
+      ClientId: CLIENT_ID,
+      ChallengeName: "NEW_PASSWORD_REQUIRED",
+      Session: req.body.session,
+      ChallengeResponses: {
+        USERNAME: req.body.email,
+        NEW_PASSWORD: req.body.password,
+      }
+    }
+  
+      try {
+        const command = new SignUpCommand(params);
+        const response = await clientCognito.send(command);
+  
+        res.status(200).json({ sub: response.UserSub });
+  
+      } catch(error) {
+        console.log(error);
+  
+        res.status(500).json({ 
+          message: "Nie udało się zarejestrować użytkownika",
+          error: error.message, 
+        });
+      }
+    });
+
 
 router.post(
   "/confirm", 
