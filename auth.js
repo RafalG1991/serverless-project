@@ -2,7 +2,7 @@ const express = require("express");
 const { validationResult } = require("express-validator");
 const serverless = require("serverless-http");
 const {body} = require("express-validator");
-const { CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand, AdminInitiateAuthCommand } = require("@aws-sdk/client-cognito-identity-provider");
+const { CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand, AdminInitiateAuthCommand, RespondToAuthChallengeCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
 const { REGION, CLIENT_ID, USER_POOL_ID } = process.env;
 const clientCognito = new CognitoIdentityProviderClient({ region: REGION });
@@ -117,21 +117,21 @@ router.post(
       }
     }
   
-      try {
-        const command = new SignUpCommand(params);
-        const response = await clientCognito.send(command);
+    try {
+      const command = new RespondToAuthChallengeCommand(params);
+      const response = await clientCognito.send(command);
   
-        res.status(200).json({ sub: response.UserSub });
+      res.status(200).json({ ...response.AuthenticationResult });
   
-      } catch(error) {
-        console.log(error);
+    } catch(error) {
+      console.log(error);
   
-        res.status(500).json({ 
-          message: "Nie udało się zarejestrować użytkownika",
-          error: error.message, 
-        });
-      }
-    });
+      res.status(500).json({ 
+        message: "Nie udało się zmieniń hasła",
+        error: error.message, 
+      });
+    }
+  });
 
 
 router.post(
