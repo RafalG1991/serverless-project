@@ -41,7 +41,7 @@ router.post(
       const command = new SignUpCommand(params);
       const response = await clientCognito.send(command);
 
-    res.status(200).json({ sub: response.UserSub });
+      res.status(200).json({ sub: response.UserSub });
 
     } catch(error) {
       console.log(error);
@@ -70,9 +70,19 @@ router.post(
       ConfirmationCode: req.body.code,
     }
 
-    
+    try {
+      const command = new ConfirmSignUpCommand(params);
+      const response = await clientCognito.send(command);
 
-    res.status(200).json({ message: "confirm" });
+      res.status(200).json({ message: "Użytkownik potwierdzony" });
+    } catch(error) {
+      console.log(error);
+
+      res.status(500).json({ 
+        message: "Nie udało się potwierdzić użytkownika",
+        error: error.message, 
+      });
+    }
 });
 
 app.use('/auth', router);
