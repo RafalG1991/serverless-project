@@ -37,7 +37,14 @@ router.post(
       const command = new AdminInitiateAuthCommand(params);
       const response = await clientCognito.send(command);
 
-      res.status(200).json({ ...response.AuthenticationResult });
+      if(response.ChallengeName) {
+        res.status(200).json({
+          ChallengeName: response.ChallengeName,
+          Session: response.Session,
+        });
+      } else {
+        res.status(200).json({ ...response.AuthenticationResult });
+      }
 
     } catch(error) {
       console.log(error);
