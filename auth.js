@@ -2,6 +2,7 @@ const express = require("express");
 const { validationResult } = require("express-validator");
 const serverless = require("serverless-http");
 const {body} = require("express-validator");
+const { CognitoIdentityProviderClient, ListDevicesCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
 const app = express();
 
