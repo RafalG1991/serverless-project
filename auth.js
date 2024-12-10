@@ -20,7 +20,7 @@ router.post(
   async (req, res) => {
     const result = validationResult(req);
     if(!result.isEmpty()) {
-      return res.status(200).json({ errors: result.array() })
+      return res.status(500).json({ errors: result.array() })
     }
 
     const params = {
@@ -60,7 +60,7 @@ router.post(
   async (req, res) => {
     const result = validationResult(req);
     if(!result.isEmpty()) {
-      return res.status(200).json({ errors: result.array() })
+      return res.status(500).json({ errors: result.array() })
     }
 
     const params = {
@@ -97,7 +97,7 @@ router.post(
   async (req, res) => {
     const result = validationResult(req);
     if(!result.isEmpty()) {
-      return res.status(200).json({ errors: result.array() })
+      return res.status(500).json({ errors: result.array() })
     }
 
     const params = {
