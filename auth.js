@@ -2,10 +2,10 @@ const express = require("express");
 const { validationResult } = require("express-validator");
 const serverless = require("serverless-http");
 const {body} = require("express-validator");
-const { CognitoIdentityProviderClient, ListDevicesCommand } = require("@aws-sdk/client-cognito-identity-provider");
+const { CognitoIdentityProviderClient, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
-const { REGION } = process.env;
-const client = new CognitoIdentityProviderClient({ region: REGION });
+const { REGION, CLIENT_ID } = process.env;
+const clientCognito = new CognitoIdentityProviderClient({ region: REGION });
 
 const app = express();
 
@@ -26,6 +26,25 @@ router.post(
     if(!result.isEmpty()) {
       return res.status(200).json({ errors: result.array() })
     }
+
+    const params = {
+      ClientId: CLIENT_ID,
+      Username: req.body.email,
+      Password: req.body.password,
+      UserAttributes: [{
+        Name: 'email',
+        Value: req.body.email,
+      }]
+    }
+
+    try {
+      const command = new SignUpCommand(params);
+      const response = await clientCognito.send(command);
+    } catch(error) {
+      
+    }
+
+
     res.status(200).json({ message: "register" });
   });
 
