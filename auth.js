@@ -40,12 +40,17 @@ router.post(
     try {
       const command = new SignUpCommand(params);
       const response = await clientCognito.send(command);
+
+    res.status(200).json({ sub: response.UserSub });
+
     } catch(error) {
+      console.log(error);
       
+      res.status(500).json({ 
+        message: "Nie udało się zarejestrować użytkownika",
+        error: error.message, 
+      });
     }
-
-
-    res.status(200).json({ message: "register" });
   });
 
 
