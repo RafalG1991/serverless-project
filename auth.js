@@ -4,6 +4,8 @@ const serverless = require("serverless-http");
 const {body} = require("express-validator");
 const { CognitoIdentityProviderClient, ListDevicesCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
+const client = new CognitoIdentityProviderClient({ region: "REGION" });
+
 const app = express();
 
 app.use(express.json());
