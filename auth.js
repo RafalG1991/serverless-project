@@ -2,7 +2,7 @@ const express = require("express");
 const { validationResult } = require("express-validator");
 const serverless = require("serverless-http");
 const {body} = require("express-validator");
-const { CognitoIdentityProviderClient, SignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
+const { CognitoIdentityProviderClient, SignUpCommand, ConfirmSignUpCommand } = require("@aws-sdk/client-cognito-identity-provider");
 
 const { REGION, CLIENT_ID } = process.env;
 const clientCognito = new CognitoIdentityProviderClient({ region: REGION });
@@ -45,7 +45,7 @@ router.post(
 
     } catch(error) {
       console.log(error);
-      
+
       res.status(500).json({ 
         message: "Nie udało się zarejestrować użytkownika",
         error: error.message, 
@@ -54,8 +54,25 @@ router.post(
   });
 
 
-router.post("/confirm", async (req, res) => {
-  res.status(200).json({ message: "confirm" });
+router.post(
+  "/confirm", 
+  body('email').isEmail(), 
+  body('code').notEmpty(), 
+  async (req, res) => {
+    const result = validationResult(req);
+    if(!result.isEmpty()) {
+      return res.status(200).json({ errors: result.array() })
+    }
+
+    const params = {
+      ClientId: CLIENT_ID,
+      Username: req.body.email,
+      ConfirmationCode: req.body.code,
+    }
+
+    
+
+    res.status(200).json({ message: "confirm" });
 });
 
 app.use('/auth', router);
