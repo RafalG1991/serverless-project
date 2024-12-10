@@ -1,5 +1,7 @@
 const express = require("express");
+const { validationResult } = require("express-validator");
 const serverless = require("serverless-http");
+const {query} = require("express-validator");
 
 const app = express();
 
@@ -11,7 +13,11 @@ router.post("/login", async (req, res) => {
     res.status(200).json({ message: "login" });
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", query('person').notEmpty() ,async (req, res) => {
+  const result = validationResult(req);
+  if(!result.isEmpty()) {
+    res.send({ errors: result.array() })
+  }
   res.status(200).json({ message: "register" });
 });
 
