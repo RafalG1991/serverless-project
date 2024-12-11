@@ -37,7 +37,7 @@ provider:
             - Fn::Sub: arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
             
   environment:
-    USERS_TABLE: ${param:tableName}
+    TICKETS_TABLE: ${param:tableName}
     USER_POOL_ID: { Ref: UserPool }
     CLIENT_ID: { Ref: UserClient }
     REGION: ${self:provider.region}
