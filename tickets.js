@@ -12,7 +12,7 @@ const { v4: uuidv4} = require("uuid");
 
 const app = express();
 
-const USERS_TABLE = process.env.USERS_TABLE;
+const TICKETS_TABLE = process.env.TICKETS_TABLE;
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
@@ -22,12 +22,19 @@ const TICKET_STATUS = {
   CLOSED: "CLOSED",
 }
 
+function checkUser(req, res, next) {
+  const token = req.headers.authorization.split(' ')[1];
+
+  next();
+}
+
 app.use(express.json());
 
 const router = express.Router();
 
 router.post(
   "/create", 
+  checkUser,
   body('title').notEmpty(), 
   body('description').notEmpty(), 
   async (req, res) => {
@@ -36,9 +43,18 @@ router.post(
       return res.status(500).json({ errors: result.array() })
     }
 
+    const ticketId = uuidv4();
+
     const params = {
-      TableName: USERS_TABLE,
-      Item: {  },
+      TableName: TICKETS_TABLE,
+      Item: {
+        tickedId: tickedIt,
+        userSub: "sub1",
+        createdAt: Date.now(),
+        title: req.body.title,
+        description: req.body.description,
+        status: TICKET_STATUS.NEW,
+      },
     };
   
     try {
