@@ -9,6 +9,7 @@ const {
 const express = require("express");
 const serverless = require("serverless-http");
 const { v4: uuidv4} = require("uuid");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
