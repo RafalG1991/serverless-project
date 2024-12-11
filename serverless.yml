@@ -8,7 +8,7 @@ service: ticket-system
 stages:
   default:
     params:
-      tableName: "users-table-${sls:stage}"
+      tableName: "tickets-table-${sls:stage}"
 
 provider:
   name: aws
@@ -27,7 +27,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::GetAtt: [UsersTable, Arn]
+            - Fn::GetAtt: [TicketsTable, Arn]
         - Effect: Allow
           Action:
             - "cognito-idp:AdminInitiateAuth"
@@ -89,14 +89,14 @@ resources:
         IdTokenValidity: 5
         ExplicitAuthFlows:
           - "ADMIN_NO_SRP_AUTH"
-    UsersTable:
+    TicketsTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: userId
+          - AttributeName: ticketId
             AttributeType: S
         KeySchema:
-          - AttributeName: userId
+          - AttributeName: ticketId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
