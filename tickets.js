@@ -24,16 +24,21 @@ const TICKET_STATUS = {
   CLOSED: "CLOSED",
 }
 
+const ROLES = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+}
+
 function checkUser(req, res, next) {
   const token = req.headers.authorization.split(' ')[1];
 
   try {
     const decoded = jwt.decode(token);
     const groups = decoded['cognito:groups'];
-    let role = "USER";
+    let role = ROLES.USER;
 
     if(groups && groups.includes("ADMIN")) {
-      role = "ADMIN";
+      role = ROLES.ADMIN;
     }
 
     req.user = {
@@ -97,23 +102,42 @@ router.post(
   });
 
   router.get(
-    "/", 
+    "/all", 
     checkUser,
     async (req, res) => {
       const user = req.user;
-        
+
       const params = {
         TableName: TICKETS_TABLE,
-        IndexName: "UserSubIndex",
-        KeyConditionExpression: "#userSub = :userSubValue",
-        ExpressionAttributeNames: {
-          "#userSub": "userSub",
-        },
-        ExpressionAttributeValues: {
-          ":userSubValue": user.sub,
-        },
         ScanIndexForward: true,
       };
+
+      if(user.role === ROLES.ADMIN) {
+        params = {
+          ...params,
+          IndexName: "StatusIndex",
+          KeyConditionExpression: "#status = :statusNewValue",
+          ExpressionAttributeNames: {
+            "#status": "status",
+          },
+          ExpressionAttributeValues: {
+            ":statusNewValue": TICKET_STATUS.NEW,
+          },
+        };
+      } else {
+        params = {
+          ...params,
+          IndexName: "UserSubIndex",
+          KeyConditionExpression: "#userSub = :userSubValue",
+          ExpressionAttributeNames: {
+            "#userSub": "userSub",
+          },
+          ExpressionAttributeValues: {
+            ":userSubValue": user.sub,
+          },
+        };
+      }
+        
     
       try {
         const command = new QueryCommand(params);
