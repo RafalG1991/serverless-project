@@ -4,6 +4,7 @@ const {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  QueryCommand,
 } = require("@aws-sdk/lib-dynamodb");
 
 const express = require("express");
@@ -94,6 +95,46 @@ router.post(
       });
     }
   });
+
+  router.get(
+    "/", 
+    checkUser,
+    async (req, res) => {
+      const user = req.user;
+        
+      const params = {
+        TableName: TICKETS_TABLE,
+        IndexName: "UserSubIndex",
+        KeyConditionExpression: "#userSub = :userSubValue",
+        ExpressionAttributeNames: {
+          "#userSub": "userSub",
+        },
+        ExpressionAttributeValues: {
+          ":userSubValue": user.sub,
+        },
+        ScanIndexForward: true,
+      };
+    
+      try {
+        const command = new QueryCommand(params);
+        const data = await docClient.send(command);
+        res.status(200).json({
+          count: data.Count,
+          tickets: data.Items,
+        });
+      } catch(error) {
+        console.log(error);
+  
+        res.status(500).json({ 
+          message: "Nie udało się wczytać ticketów",
+          error: error.message, 
+        });
+      }
+    });
+
+
+
+
 
 app.get("/users/:userId", async (req, res) => {
   const params = {
