@@ -8,6 +8,7 @@ const {
 
 const express = require("express");
 const serverless = require("serverless-http");
+const { v4: uuidv4} = require("uuid");
 
 const app = express();
 
@@ -15,14 +16,20 @@ const USERS_TABLE = process.env.USERS_TABLE;
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
+const TICKET_STATUS = {
+  NEW: "NEW",
+  OPEN: "OPEN",
+  CLOSED: "CLOSED",
+}
+
 app.use(express.json());
 
 const router = express.Router();
 
 router.post(
-  "/register", 
-  body('email').isEmail(), 
-  body('password').notEmpty(), 
+  "/create", 
+  body('title').notEmpty(), 
+  body('description').notEmpty(), 
   async (req, res) => {
     const result = validationResult(req);
     if(!result.isEmpty()) {
@@ -30,26 +37,19 @@ router.post(
     }
 
     const params = {
-      ClientId: CLIENT_ID,
-      Username: req.body.email,
-      Password: req.body.password,
-      UserAttributes: [{
-        Name: 'email',
-        Value: req.body.email,
-      }]
-    }
-
+      TableName: USERS_TABLE,
+      Item: {  },
+    };
+  
     try {
-      const command = new SignUpCommand(params);
-      const response = await clientCognito.send(command);
-
-      res.status(200).json({ sub: response.UserSub });
-
+      const command = new PutCommand(params);
+      await docClient.send(command);
+      res.json({  });
     } catch(error) {
       console.log(error);
 
       res.status(500).json({ 
-        message: "Nie udało się zarejestrować użytkownika",
+        message: "Nie udało się utworzyć ticketu",
         error: error.message, 
       });
     }
