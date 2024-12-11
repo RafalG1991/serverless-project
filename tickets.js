@@ -26,7 +26,16 @@ const TICKET_STATUS = {
 function checkUser(req, res, next) {
   const token = req.headers.authorization.split(' ')[1];
 
-  next();
+  try {
+    const decoded = jwt.decode(token);
+    next();
+    
+  } catch(error) {
+      res.status(401).json({
+        message: "Błędny token",
+        error: error.message,
+      })
+  }
 }
 
 app.use(express.json());
