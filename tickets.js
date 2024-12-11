@@ -82,7 +82,9 @@ router.post(
     try {
       const command = new PutCommand(params);
       await docClient.send(command);
-      res.json({  });
+      res.status(200).json({
+        ...params,
+      });
     } catch(error) {
       console.log(error);
 
