@@ -17,6 +17,44 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 app.use(express.json());
 
+const router = express.Router();
+
+router.post(
+  "/register", 
+  body('email').isEmail(), 
+  body('password').notEmpty(), 
+  async (req, res) => {
+    const result = validationResult(req);
+    if(!result.isEmpty()) {
+      return res.status(500).json({ errors: result.array() })
+    }
+
+    const params = {
+      ClientId: CLIENT_ID,
+      Username: req.body.email,
+      Password: req.body.password,
+      UserAttributes: [{
+        Name: 'email',
+        Value: req.body.email,
+      }]
+    }
+
+    try {
+      const command = new SignUpCommand(params);
+      const response = await clientCognito.send(command);
+
+      res.status(200).json({ sub: response.UserSub });
+
+    } catch(error) {
+      console.log(error);
+
+      res.status(500).json({ 
+        message: "Nie udało się zarejestrować użytkownika",
+        error: error.message, 
+      });
+    }
+  });
+
 app.get("/users/:userId", async (req, res) => {
   const params = {
     TableName: USERS_TABLE,
@@ -64,6 +102,8 @@ app.post("/users", async (req, res) => {
     res.status(500).json({ error: "Could not create user" });
   }
 });
+
+app.use('/ticket', router);
 
 app.use((req, res, next) => {
   return res.status(404).json({
