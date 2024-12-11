@@ -28,8 +28,20 @@ function checkUser(req, res, next) {
 
   try {
     const decoded = jwt.decode(token);
+    const groups = decoded['cognito:groups'];
+    let role = "USER";
+
+    if(groups && groups.includes("ADMIN")) {
+      role = "ADMIN";
+    }
+
+    req.user = {
+      sub: decoded.sub,
+      role: role,
+    }
+
     next();
-    
+
   } catch(error) {
       res.status(401).json({
         message: "Błędny token",
