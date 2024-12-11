@@ -95,8 +95,23 @@ resources:
         AttributeDefinitions:
           - AttributeName: ticketId
             AttributeType: S
+          - AttributeName: userSub
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: N
         KeySchema:
           - AttributeName: ticketId
             KeyType: HASH
+          - AttributeName: createdAt
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: UserSubIndex
+            KeySchema:
+            - AttributeName: userSub
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
