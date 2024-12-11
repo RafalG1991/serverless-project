@@ -28,6 +28,7 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [TicketsTable, Arn]
+            - Fn::Sub: "${TicketsTable.Arn}/index/*"
         - Effect: Allow
           Action:
             - "cognito-idp:AdminInitiateAuth"
