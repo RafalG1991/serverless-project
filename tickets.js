@@ -130,13 +130,14 @@ router.post(
         ExpressionAttributeValues: {
           ":statusValue": status,
         },
+        ReturnValue: "UPDATE_NEW",
       };
     
       try {
         const command = new PutCommand(params);
-        await docClient.send(command);
+        const data = await docClient.send(command);
         res.status(200).json({
-          ...params,
+          ...data,
         });
       } catch(error) {
         console.log(error);
