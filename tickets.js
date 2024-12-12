@@ -134,9 +134,14 @@ router.post(
         const ticketsNew = await getTicketsByStatus(TICKET_STATUS.NEW);
 
         res.status(200).json({
-          count: data.Count,
-          ticketsOpen,
-          ticketsNew,
+          ticketsOpen: {
+            count: ticketsOpen.count,
+            tickets: ticketsOpen.Items,
+          },
+          ticketsNew: {
+            count: ticketsNew.count,
+            tickets: ticketsNew.Items,
+          },
         });
 
       } else {
