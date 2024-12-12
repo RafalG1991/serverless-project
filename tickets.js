@@ -105,6 +105,23 @@ router.post(
     "/all", 
     checkUser,
     async (req, res) => {
+      const getTicketsByStatus = async (status) => {
+        params = {
+          ...params,
+          IndexName: "StatusIndex",
+          KeyConditionExpression: "#status = :statusValue",
+          ExpressionAttributeNames: {
+            "#status": "status",
+          },
+          ExpressionAttributeValues: {
+            ":statusValue": status,
+          },
+        };
+
+        const command = new QueryCommand(params);
+        const dataOpen = await docClient.send(command);
+      }
+
       const user = req.user;
 
       const params = {
@@ -113,17 +130,15 @@ router.post(
       };
 
       if(user.role === ROLES.ADMIN) {
-        params = {
-          ...params,
-          IndexName: "StatusIndex",
-          KeyConditionExpression: "#status = :statusNewValue",
-          ExpressionAttributeNames: {
-            "#status": "status",
-          },
-          ExpressionAttributeValues: {
-            ":statusNewValue": TICKET_STATUS.NEW,
-          },
-        };
+        const ticketsOpen = await getTicketsByStatus(TICKET_STATUS.OPEN);
+        const ticketsNew = await getTicketsByStatus(TICKET_STATUS.NEW);
+
+        res.status(200).json({
+          count: data.Count,
+          ticketsOpen,
+          ticketsNew,
+        });
+
       } else {
         params = {
           ...params,
