@@ -104,6 +104,7 @@ router.post(
   router.post(
     "/update-status", 
     checkUser,
+    body('ticketId').notEmpty(),
     body('status').isIn([TICKET_STATUS.OPEN, TICKET_STATUS.CLOSED]), 
     async (req, res) => {
       const result = validationResult(req);
@@ -114,10 +115,21 @@ router.post(
       if(!user.role === ROLES.ADMIN) {
         return res.status(403).json({ message: "Brak uprawnień"});
       }
+
+      const {ticketId, status} = req.body;
     
       const params = {
         TableName: TICKETS_TABLE,
-        
+        Key: {
+          tickedId: ticketId,
+        },
+        UpdateExpression: "set #status = :statusValue",
+        ExpressionAttributeNames: {
+          "#status": "status",
+        },
+        ExpressionAttributeValues: {
+          ":statusValue": status,
+        },
       };
     
       try {
