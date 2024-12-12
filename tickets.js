@@ -101,6 +101,41 @@ router.post(
     }
   });
 
+  router.post(
+    "/update-status", 
+    checkUser,
+    body('status').isIn([TICKET_STATUS.OPEN, TICKET_STATUS.CLOSED]), 
+    async (req, res) => {
+      const result = validationResult(req);
+      if(!result.isEmpty()) {
+        return res.status(500).json({ errors: result.array() })
+      }
+
+      if(!user.role === ROLES.ADMIN) {
+        return res.status(403).json({ message: "Brak uprawnień"});
+      }
+    
+      const params = {
+        TableName: TICKETS_TABLE,
+        
+      };
+    
+      try {
+        const command = new PutCommand(params);
+        await docClient.send(command);
+        res.status(200).json({
+          ...params,
+        });
+      } catch(error) {
+        console.log(error);
+  
+        res.status(500).json({ 
+          message: "Nie udało się zmienić statusu ticketu",
+          error: error.message, 
+        });
+      }
+    });
+
   router.get(
     "/all", 
     checkUser,
