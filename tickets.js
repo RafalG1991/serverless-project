@@ -106,7 +106,7 @@ router.post(
     checkUser,
     async (req, res) => {
       const getTicketsByStatus = async (status) => {
-        params = {
+        const params = {
           ...params,
           IndexName: "StatusIndex",
           KeyConditionExpression: "#status = :statusValue",
